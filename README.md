@@ -5,7 +5,11 @@ StriDe: https://github.com/ythuang0522/StriDe
 
 Command: 
 
-stride correct -a fmextend -t 30 -k 31 -K 15 -x 3 reads.fa -o READ.ECOLr.fasta
+stride correct -a fmextend -t 30 -k 31 -K 15 InputName.fa -o OutputName.fa
+
+InputName.fa : Input file(fasta)
+
+OutputName.fa : the file of corrected read.
 
 -a : the corretion algorithm.
 
