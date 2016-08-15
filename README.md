@@ -1,5 +1,7 @@
 # Execute FMextend error correction
-FMextend is a new algorithm for error correction in StriDe correct step.
+FMextend is a new algorithm for error correction step in StriDe.
+
+StriDe: https://github.com/ythuang0522/StriDe
 
 Command: 
 
