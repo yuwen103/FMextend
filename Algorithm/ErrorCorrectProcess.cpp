@@ -61,6 +61,11 @@ ErrorCorrectResult ErrorCorrectProcess::correct(const SequenceWorkItem& workItem
 			return kmerCorrection(workItem);
 			break;
 		}
+	case ECA_FMEXTEND:
+		{
+			return FMextendCorrection(workItem);
+			break;
+		}
 	case ECA_OVERLAP:
 		{
 			return overlapCorrectionNew(workItem);
