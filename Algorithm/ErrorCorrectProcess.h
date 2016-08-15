@@ -27,6 +27,7 @@ enum ErrorCorrectAlgorithm
     ECA_KMER, // kmer correction
     ECA_OVERLAP, // overlap correction
     ECA_THREAD, // thread the read through a de Bruijn graph
+	ECA_FMEXTEND, //FMextend correction
 
 };
 
