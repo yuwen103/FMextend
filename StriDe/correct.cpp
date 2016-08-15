@@ -336,8 +336,8 @@ void parseCorrectOptions(int argc, char** argv)
             case 'a': arg >> algo_str; break;
             case 'd': arg >> opt::sampleRate; break;
             case 'c': arg >> opt::conflictCutoff; break;
-            case 'K': arg >> opt::kmerLength; break;
-			case 'k': arg >> opt::check_kmerLength; break;
+            case 'k': arg >> opt::kmerLength; break;
+			case 'K': arg >> opt::check_kmerLength; break;
             case 'x': arg >> opt::kmerThreshold; break;
             case '?': die = true; break;
             case 'v': opt::verbose++; break;
