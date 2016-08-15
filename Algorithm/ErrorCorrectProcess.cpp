@@ -79,9 +79,7 @@ ErrorCorrectResult ErrorCorrectProcess::correct(const SequenceWorkItem& workItem
 	ErrorCorrectResult result;
 	return result;
 }
-
-//
-ErrorCorrectResult ErrorCorrectProcess::overlapCorrectionNew(const SequenceWorkItem& workItem)
+ErrorCorrectResult ErrorCorrectProcess::FMextendCorrection(const SequenceWorkItem& workItem)
 {
 	assert(m_params.indices.pBWT != NULL);
 	assert(m_params.indices.pSSA != NULL);
@@ -90,40 +88,23 @@ ErrorCorrectResult ErrorCorrectProcess::overlapCorrectionNew(const SequenceWorkI
 	std::string current_sequence = workItem.read.seq.toString();
 	std::string consensus;
 	
-	
-	
 	//FE_tree_test
 	std::string Query = current_sequence;
 	
-	
+	//check high correctness region kmer size
 	int SolidKmer_size=m_params.kmerLength;
+	//the kmer size of kmer alignment
 	size_t Seed_size2=m_params.check_kmerLength;
-	//std::string read_id = workItem.read.id;
-	//printf("The_ID=\t%s\n",read_id.c_str());
-	//Extension::printfKFQ(Query,SolidKmer_size,m_params.indices.pBWT);
-	//consensus=Extension::TrimReads(Query,SolidKmer_size,m_params.indices.pBWT);
-	
 	
 	int k_diff=SolidKmer_size-(int)Seed_size2;
 	Solid_error solid_info;
 	std::vector<Ksub_vct> correct_ksub;
 	std::vector<OutInfo> Out_Info;
-	//printf("correct_ksub size=%d\n",(int)correct_ksub.size());
+	
 	correct_ksub.clear();
-	//Extension::addQueryinKsub(Query,Seed_size2,correct_ksub);
-	//Extension::addQueryinOutInfo(Query,Out_Info);
-	/*
-	std::string read_id = workItem.read.id;
-	printf("The_ID=\t%s\n",read_id.c_str());
-	Extension::printfKFQ(Query,SolidKmer_size,m_params.indices.pBWT);
-	*/
-	//printf("Query:\n%s\n",Query.c_str());
 	
 	solid_info=Extension::getSolidRegion(Query,SolidKmer_size,m_params.indices.pBWT);
-	//printf("Final Start=\t%d\tEnd=\t%d\n",solid_info.solid_left_idx,solid_info.solid_right_idx);
-	
-	//printf("%d\t%d\t%s\t%s\n",solid_info.solid_left_idx,solid_info.solid_right_idx,solid_info.Left_error_1st_bp.c_str(),solid_info.Right_error_1st_bp.c_str());
-	//consensus=Extension::getSolidRegion_v2(Query,SolidKmer_size,m_params.indices.pBWT);
+
 	std::vector<BWTInterval> L_TerminatedIntervals,R_TerminatedIntervals; 
 	L_TerminatedIntervals.clear();
 	R_TerminatedIntervals.clear();
@@ -137,128 +118,61 @@ ErrorCorrectResult ErrorCorrectProcess::overlapCorrectionNew(const SequenceWorkI
 	
 	if(solid_info.solid_left_idx>=0)
 	{
-		//std::string L_last_kmer=Query.substr(solid_info.solid_left_idx,(int)Seed_size2-1);
-		//std::string R_last_kmer=Query.substr(solid_info.solid_right_idx+k_diff+1,(int)Seed_size2-1);
-		
-		//printf("2 check\n");
+
 		Extension::getLRKmerInterval(Query,Seed_size2,m_params.indices.pBWT,m_params.indices.pRBWT,L_TerminatedIntervals,R_TerminatedIntervals);
-		//printf("3 check\n");
-		//printf("Left_size=%d\tRight_size=%d\n",(int)L_TerminatedIntervals.size(),(int)R_TerminatedIntervals.size());
 		Extension::ExtensionRead(Query,SolidKmer_size,Seed_size2,solid_info.solid_right_idx,m_params.indices.pBWT,m_params.indices.pRBWT,Out_Info,L_TerminatedIntervals,R_TerminatedIntervals);
-		//printf("Out_info_reads_count=\t%d\n",(int)Out_Info.size());
-		//Extension::addStrInKsub(Out_Info,Seed_size2,correct_ksub);
-		//Extension::addStrInKsub2(Out_Info,Seed_size2,out_vct,Query);
-		
-		/*
-		for(int i=0;i<(int)Out_Info.size();i++)
-		{
-			std::string gap_temp="";
-			for(int idx=0;idx<Out_Info[i].start_point;idx++)
-			{
-				gap_temp.append("=");
-			}
-			std::string out_str=gap_temp+Out_Info[i].outStr;
-			printf(">%d\n%s\n",i,out_str.c_str());
-			//printf("Str=\t%s\nSeed_rate=\t%.2f\tSize=\t%d\n",out_str.c_str(),Out_Info[i].Seed_rate,Out_Info[i].interval_size);
-		}
-		*/
-		
-		//int temp_kmer_size=15;
-		
-		
-		//Seed_size2=1;
-		//k_diff=SolidKmer_size-(int)Seed_size2;
 		
 		std::string L_last_kmer=Query.substr(solid_info.solid_left_idx,Seed_size2-1);
 		std::string R_last_kmer=Query.substr(solid_info.solid_right_idx+(SolidKmer_size-Seed_size2)+1,Seed_size2-1);
 		std::string L_First_kmer=Query.substr(solid_info.solid_left_idx,SolidKmer_size-1);
 		std::string R_First_kmer=Query.substr(solid_info.solid_right_idx+1,SolidKmer_size-1);
-		//test k-diff
-		//k_diff=(SolidKmer_size-temp_kmer_size);
 		
-		//Extension::addStrInKsub3(Out_Info,Seed_size2,correct_ksub,Query);
 		Extension::addStrInKsub3(Out_Info,Seed_size2,correct_ksub,Query);
-		//printf("4 check\n");
 		
-		/*
-		if(solid_info.solid_left_idx>0)
-			left_correct=Extension::correct_left(solid_info,correct_ksub,L_last_kmer);
-		right_correct=Extension::correct_right(solid_info,correct_ksub,k_diff,R_last_kmer);
-		*/
 		if(solid_info.solid_left_idx>0)
 			left_correct=Extension::Newcorrect_left(Query,solid_info,correct_ksub,L_last_kmer,L_First_kmer,SolidKmer_size,m_params.indices.pBWT);
 		right_correct=Extension::Newcorrect_right(Query,solid_info,correct_ksub,k_diff,R_last_kmer,R_First_kmer,SolidKmer_size,m_params.indices.pBWT);
 		
-		//printf("5 check\n");
 		solid_Region=Query.substr(solid_info.solid_left_idx,(solid_info.solid_right_idx-solid_info.solid_left_idx+SolidKmer_size));
 		correct_str=left_correct+solid_Region+right_correct;
-		//printf("L=\t%s\nS=\t%s\nR=\t%s\n",left_correct.c_str(),solid_Region.c_str(),right_correct.c_str());
-		//printf("6 check\n");
-		
-		//consensus=Extension::TrimReads(correct_str,31,m_params.indices.pBWT);
-		
-		//consensus=Extension::NewTrimReads(correct_str,31,m_params.indices.pBWT);
-		
-		//printf("Before:\t%s\n",correct_str.c_str());
-		//printf("After:\t%s\n",consensus.c_str());
-		
-		//Extension::printfKFQ(correct_str,SolidKmer_size,m_params.indices.pBWT);
-		//printf("Correct=\t%s\n",correct_str.c_str());
-		//printf("Trim_st=\t%s\n",consensus.c_str());
 		consensus=correct_str;
-		
 	}
 	else if(solid_info.solid_left_idx==-3)
 	{
-		//printf("Didn't have any FQ>1 31-kmer.\n");
 		consensus=current_sequence;
 	}
 	else
 	{
-		//printf("First round don't find Seed.\n");
-		//int temp_solid_size=SolidKmer_size-10;
 		int temp_solid_size=15;
-		if(temp_solid_size>12)
-		{
+		
 			Seed_size2=7;
 			k_diff=temp_solid_size-(int)Seed_size2;
 			
-			//Extension::printfKFQ(Query,temp_solid_size,m_params.indices.pBWT);
-			//solid_info=Extension::highError_getSolidRegion(Query,temp_solid_size,m_params.indices.pBWT);
-			//Extension::printfKFQ(Query,temp_solid_size,m_params.indices.pBWT);
 			solid_info=Extension::getSolidRegion(Query,temp_solid_size,m_params.indices.pBWT);
 			
 			if(solid_info.solid_left_idx>=0)
 			{
 				Extension::getLRKmerInterval(Query,Seed_size2,m_params.indices.pBWT,m_params.indices.pRBWT,L_TerminatedIntervals,R_TerminatedIntervals);
 				Extension::ExtensionRead(Query,temp_solid_size,Seed_size2,solid_info.solid_right_idx,m_params.indices.pBWT,m_params.indices.pRBWT,Out_Info,L_TerminatedIntervals,R_TerminatedIntervals);
-				//Seed_size2=1;
-				//k_diff=SolidKmer_size-(int)Seed_size2;
+
 				std::string L_last_kmer=Query.substr(solid_info.solid_left_idx,Seed_size2-1);
 				std::string R_last_kmer=Query.substr(solid_info.solid_right_idx+(temp_solid_size-Seed_size2)+1,Seed_size2-1);
 				std::string L_First_kmer=Query.substr(solid_info.solid_left_idx,temp_solid_size-1);
 				std::string R_First_kmer=Query.substr(solid_info.solid_right_idx+1,temp_solid_size-1);
-				
-				//printf("The num of find reads = %d\n",(int)Out_Info.size());
-				
+
 				Extension::addStrInKsub3(Out_Info,Seed_size2,correct_ksub,Query);
 				if(solid_info.solid_left_idx>0)
 					left_correct=Extension::Newcorrect_left(Query,solid_info,correct_ksub,L_last_kmer,L_First_kmer,temp_solid_size,m_params.indices.pBWT);
 				right_correct=Extension::Newcorrect_right(Query,solid_info,correct_ksub,k_diff,R_last_kmer,R_First_kmer,temp_solid_size,m_params.indices.pBWT);
 				solid_Region=Query.substr(solid_info.solid_left_idx,(solid_info.solid_right_idx-solid_info.solid_left_idx+temp_solid_size));
 				correct_str=left_correct+solid_Region+right_correct;
-				//printf("Correct=\t%s\n",correct_str.c_str());
-				//printf("Trim_st=\t%s\n",consensus.c_str());
+
 				consensus=correct_str;
 			}
-		}
-		else
-		{
-			//printf("No_correct\n");
-		}
 	}
 	
-	
+	//The code below is print the kmer count at each position
+	/*
 	for(int test=0;test<(int)correct_ksub.size();test++)
 	{
 		printf("At position:%d Have Kmer:\n",test);
@@ -267,11 +181,7 @@ ErrorCorrectResult ErrorCorrectProcess::overlapCorrectionNew(const SequenceWorkI
 			printf("%dth\t%s\tcount=\t%d\n",t,correct_ksub[test][t].kmer.c_str(),correct_ksub[test][t].countOfkmer);
 		}
 	}
-	
-	
-	//printf("Left=\t%s\tSolid_region=\t%s\tRight=\t%s\n",left_correct.c_str(),
-	//Query.substr(solid_info.solid_left_idx,(solid_info.solid_right_idx-solid_info.solid_left_idx+SolidKmer_size)).c_str(),right_correct.c_str());
-	
+	*/
 	correct_ksub.clear();
 	L_TerminatedIntervals.clear();
 	R_TerminatedIntervals.clear();
@@ -290,6 +200,209 @@ ErrorCorrectResult ErrorCorrectProcess::overlapCorrectionNew(const SequenceWorkI
 		result.overlapQC = true;
 	}
 	
+	return result;
+}
+
+//
+ErrorCorrectResult ErrorCorrectProcess::overlapCorrectionNew(const SequenceWorkItem& workItem)
+{
+	assert(m_params.indices.pBWT != NULL);
+	assert(m_params.indices.pSSA != NULL);
+
+	ErrorCorrectResult result;
+	std::string current_sequence = workItem.read.seq.toString();
+	std::string consensus;
+
+	/**************************************************************************************/
+	int parameterThreshold = CorrectionThresholds::Instance().getRequiredSupport(0)-1;
+	if  ( parameterThreshold < 0 ) parameterThreshold=0;
+		size_t threshold = (size_t)parameterThreshold ;
+	/**************************************************************************************/
+
+	int num_rounds = m_params.numOverlapRounds;
+	bool isFirstRound=true;
+	for(int round = 0; round < num_rounds; ++round)
+	{
+        KmerContext  kc (current_sequence,m_params.kmerLength,m_params.indices);
+		bool allGoodKmer = true;
+        int ErrorIdx=-1;
+		//Locate the error index in the read via (1) kmer freq difference between two adjacent kmers and (2) kmer frequency centered at the error base
+		/***   kmer freq diff between two adjacent kmers
+				49:32
+				50:33
+				51:14   --> The end base of 51th kmer has touched the error base but kmer freq is still > kmer threshold
+				52:14
+				53: 9 
+				============================================================================
+				46:854:48
+				47:836:62
+				...
+				60:45:52
+				61:1:0		->The end base of 61th kmer touched the error
+        ***/
+		// std::cout << current_sequence << "\n";
+        for (size_t i = 0 ; i < kc.numKmer; i++){
+            // std::cout << i <<":" << kc.kmerFreqs_same[i] << ":" << kc.kmerFreqs_revc [i]  << ":" <<kc.numKmer << "\n";
+            // if ( kc.kmerFreqs_same.at(i)< threshold || kc.kmerFreqs_revc.at(i) < threshold) allGoodKmer=false;
+			if ( kc.kmerFreqs_same.at(i) + kc.kmerFreqs_revc.at(i) < threshold*2) allGoodKmer=false;
+            
+            if(i<kc.numKmer-1)
+			{
+				//(1) Compute kmer freq decrement between two adjacent kmers, note that kmerFreq is unsigned and required casting to int
+				bool isFwdFreqLargeDiff= kc.kmerFreqs_same.at(i)>threshold?((int)kc.kmerFreqs_same.at(i)-(int)kc.kmerFreqs_same.at(i+1))/(double)kc.kmerFreqs_same.at(i)>=0.5 : false;
+				bool isRvcFreqLargeDiff= kc.kmerFreqs_revc.at(i)>threshold?((int)kc.kmerFreqs_revc[i]-(int)kc.kmerFreqs_revc.at(i+1))/(double)kc.kmerFreqs_revc[i]>=0.5 : false;
+				isFwdFreqLargeDiff= (int)kc.kmerFreqs_same.at(i)-(int)kc.kmerFreqs_same.at(i+1) >10 && isFwdFreqLargeDiff;
+				isRvcFreqLargeDiff= (int)kc.kmerFreqs_revc.at(i)-(int)kc.kmerFreqs_revc.at(i+1) >10 && isRvcFreqLargeDiff;
+				
+				if ( isFwdFreqLargeDiff && isRvcFreqLargeDiff ) 
+				{
+					int tmpErrorIdx=i+m_params.kmerLength;
+					int kmer_idx = tmpErrorIdx - m_params.kmerLength/2;
+					if(kmer_idx>=(int)kc.numKmer) kmer_idx=kc.numKmer-1;
+					// size_t kmer_idx_freq=kc.kmerFreqs_same.at(kmer_idx) + kc.kmerFreqs_revc.at(kmer_idx);
+					
+					//Flanking kmer freq of correct bases
+					// size_t avgCount = (kc.kmerFreqs_same.at(i)+kc.kmerFreqs_revc.at(i))*3/2;
+
+					//case 1: correction of sequencing error
+					//if( /*isFirstRound &&*/ (kc.kmerFreqs_same.at(kmer_idx)< threshold || kc.kmerFreqs_revc.at(kmer_idx) < threshold))
+					if( /*isFirstRound &&*/ (kc.kmerFreqs_same.at(kmer_idx) + kc.kmerFreqs_revc.at(kmer_idx) < threshold*2))
+					{
+						allGoodKmer=false;
+						if(attemptKmerCorrection(tmpErrorIdx, kmer_idx, threshold, current_sequence))
+							break;
+						else if(!isFirstRound)
+						{
+							ErrorIdx=((int)i-4>=0)?i-4:0;
+							break;
+						}
+					}
+					//case 2: Convert heterozygous SNPs of diploid genomes into homozygotes
+					// else if(isFirstRound && m_params.isDiploid && kmer_idx_freq < avgCount && avgCount<200)
+					// {
+						// if(tmpErrorIdx+1> (int)kc.numKmer-1) continue;
+						// if(kc.kmerFreqs_same.at(i+1)<threshold || kc.kmerFreqs_revc.at(i+1)<threshold ) continue;
+						// isFwdFreqLargeDiff= kc.kmerFreqs_same.at(tmpErrorIdx+1)>threshold?((int)kc.kmerFreqs_same.at(tmpErrorIdx+1)-(int)kc.kmerFreqs_same[tmpErrorIdx])/(double)kc.kmerFreqs_same.at(tmpErrorIdx+1)>=0.5 : false;
+						// isRvcFreqLargeDiff= kc.kmerFreqs_revc.at(tmpErrorIdx+1)>threshold?((int)kc.kmerFreqs_revc.at(tmpErrorIdx+1)-(int)kc.kmerFreqs_revc[tmpErrorIdx])/(double)kc.kmerFreqs_revc.at(tmpErrorIdx+1)>=0.5 : false;
+						// isFwdFreqLargeDiff= (int)kc.kmerFreqs_same.at(tmpErrorIdx+1)-(int)kc.kmerFreqs_same[tmpErrorIdx] >10 && (tmpErrorIdx+1)< (int)kc.numKmer;
+						// isRvcFreqLargeDiff= (int)kc.kmerFreqs_revc.at(tmpErrorIdx+1)-(int)kc.kmerFreqs_revc[tmpErrorIdx] >10  && (tmpErrorIdx+1)<(int)kc.numKmer;
+						// avgCount = (kc.kmerFreqs_same.at(tmpErrorIdx+1)+kc.kmerFreqs_revc.at(tmpErrorIdx+1))*3/2;
+						// if(isFwdFreqLargeDiff && isFwdFreqLargeDiff && avgCount<200)
+						// {
+							// // std::cout << ">" << tmpErrorIdx  << "\n" << current_sequence << "\n";
+							// // getchar();
+							// if(attemptHeteroCorrection(tmpErrorIdx, kmer_idx, threshold, avgCount, current_sequence))
+							// {
+								// // i=tmpErrorIdx;	//jump to the right of the corrected base
+								// // continue;
+							// }
+						// }
+					// }
+					//case 3: Leave the correction to overlap alignment, compute the leftmost error idx
+					//else if(!isFirstRound && (kc.kmerFreqs_same.at(kmer_idx)< threshold || kc.kmerFreqs_revc.at(kmer_idx) < threshold) && ErrorIdx==-1 )
+					// else if(!isFirstRound && (kc.kmerFreqs_same.at(kmer_idx) + kc.kmerFreqs_revc.at(kmer_idx) < threshold*2) && ErrorIdx==-1 )
+					// {
+						// allGoodKmer=false;
+						// ErrorIdx=((int)i-4>=0)?i-4:0;
+						// break;
+					// }
+				}
+
+				//(1) Compute kmer freq increment between two adjacent kmers, note that kmerFreq is unsigned and required casting to int
+				isFwdFreqLargeDiff= kc.kmerFreqs_same.at(i+1)>threshold?((int)kc.kmerFreqs_same.at(i+1)-(int)kc.kmerFreqs_same.at(i))/(double)kc.kmerFreqs_same.at(i+1)>=0.5 : false;
+				isRvcFreqLargeDiff= kc.kmerFreqs_revc.at(i+1)>threshold?((int)kc.kmerFreqs_revc.at(i+1)-(int)kc.kmerFreqs_revc.at(i))/(double)kc.kmerFreqs_revc.at(i+1)>=0.5 : false;
+				isFwdFreqLargeDiff= (int)kc.kmerFreqs_same.at(i+1)-(int)kc.kmerFreqs_same.at(i) >10 && isFwdFreqLargeDiff;
+				isRvcFreqLargeDiff= (int)kc.kmerFreqs_revc.at(i+1)-(int)kc.kmerFreqs_revc.at(i) >10 && isRvcFreqLargeDiff;
+                
+				if ( isFwdFreqLargeDiff  && isRvcFreqLargeDiff) 
+				{
+					int tmpErrorIdx=i;
+					int kmer_idx = (tmpErrorIdx >= m_params.kmerLength/2 ? tmpErrorIdx - m_params.kmerLength/2 : 0);
+					// size_t kmer_idx_freq=kc.kmerFreqs_same.at(kmer_idx)+kc.kmerFreqs_revc.at(kmer_idx);
+					// size_t avgCount = (kc.kmerFreqs_same.at(i+1)+kc.kmerFreqs_revc.at(i+1))*3/2;
+
+					//case 1: Sequencing error
+					// if ( /*isFirstRound && */ (kc.kmerFreqs_same.at(kmer_idx)< threshold || kc.kmerFreqs_revc.at(kmer_idx) < threshold) ){
+					if ( /*isFirstRound && */ (kc.kmerFreqs_same.at(kmer_idx) + kc.kmerFreqs_revc.at(kmer_idx) < threshold*2) ){
+						// ErrorIdx=i+1;
+						allGoodKmer=false;
+
+						if(attemptKmerCorrection(tmpErrorIdx, kmer_idx, threshold, current_sequence))
+						{
+							break;
+						}else if(!isFirstRound)
+						{
+							ErrorIdx=i+1;
+							break;
+						}
+					}
+					//case 3: Leave the correction to overlap alignment, compute the leftmost error idx
+					// else if(!isFirstRound && (kc.kmerFreqs_same.at(kmer_idx)< threshold || kc.kmerFreqs_revc.at(kmer_idx) < threshold) && ErrorIdx==-1 )
+					// else if(!isFirstRound && (kc.kmerFreqs_same.at(kmer_idx)+ kc.kmerFreqs_revc.at(kmer_idx) < threshold*2) && ErrorIdx==-1 )
+					// {
+						// allGoodKmer=false;
+						// ErrorIdx=i+1;
+						// break;
+					// }
+				}
+			}
+			
+			//if(ErrorIdx==-1 && (kc.kmerFreqs_same.at(i)==0 || kc.kmerFreqs_revc.at(i)==0)) ErrorIdx=((int)i-4>=0)?i-4:0;;
+        }// end of for each kmer
+
+        //no need for correction if all kmers are good or bad
+        if (allGoodKmer)
+        {
+            result.correctSequence = current_sequence;
+            result.overlapQC = true;
+            return result;
+        }
+		
+		//Reset this loop if it's first round and the last kmer has been successfully corrected 
+		if(isFirstRound)
+		{
+			isFirstRound=false;
+			round--;	//redo this loop round
+			continue;
+		}
+
+		if(ErrorIdx==-1)ErrorIdx=0;	//If no kmer freq diff > 10, assume 0
+
+		// //Finally, try slower multiple alignment correction
+		MultipleAlignment multiple_alignment = KmerOverlaps::buildMultipleAlignment(current_sequence,
+																				m_params.kmerLength,
+																				current_sequence.length()/2, 	//m_params.minOverlap
+																				m_params.minIdentity - (double) (round)*0.01,
+																				threshold,
+																				m_params.indices,
+																				ErrorIdx,	//targetidx holds error idx
+																				kc); 
+
+		bool last_round = (round == num_rounds - 1);
+		if(last_round)
+			consensus = multiple_alignment.calculateBaseConsensus(kc, threshold);
+		else
+			current_sequence = multiple_alignment.calculateBaseConsensus(kc, threshold);
+			
+		// if(last_round){
+			// multiple_alignment.print(200);
+			// std::cout << ">" <<round <<":" << m_params.minIdentity <<"\n" << consensus << "\n";
+			// getchar();
+		// }
+	}
+
+	if(!consensus.empty())
+	{
+		result.correctSequence = consensus;
+		result.overlapQC = true;
+	}
+	else
+	{
+		// Return the unmodified query sequence
+		result.correctSequence = current_sequence;
+		result.overlapQC = true;
+	}
+
 	return result;
 }
 

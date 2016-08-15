@@ -115,6 +115,7 @@ class ErrorCorrectProcess
         ErrorCorrectResult kmerCorrection(const SequenceWorkItem& item);
         ErrorCorrectResult overlapCorrection(const SequenceWorkItem& workItem);
         ErrorCorrectResult overlapCorrectionNew(const SequenceWorkItem& workItem);
+		ErrorCorrectResult FMextendCorrection(const SequenceWorkItem& workItem);
         ErrorCorrectResult threadingCorrection(const SequenceWorkItem& workItem);
 
 

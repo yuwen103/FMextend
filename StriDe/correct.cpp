@@ -161,7 +161,7 @@ int correctMain(int argc, char** argv)
     BWT* pBWT = new BWT(opt::prefix + BWT_EXT, opt::sampleRate);
     BWT* pRBWT = new BWT(opt::prefix + RBWT_EXT, opt::sampleRate);;
     SampledSuffixArray* pSSA = NULL;
-    if(opt::algorithm == ECA_OVERLAP || opt::algorithm == ECA_HYBRID)
+    if(opt::algorithm == ECA_OVERLAP || opt::algorithm == ECA_HYBRID||opt::algorithm ==ECA_FMEXTEND)
         pSSA = new SampledSuffixArray(opt::prefix + SAI_EXT, SSA_FT_SAI);
 
     BWTIndexSet indexSet;
@@ -413,6 +413,8 @@ void parseCorrectOptions(int argc, char** argv)
             opt::algorithm = ECA_KMER;
         else if(algo_str == "overlap")
             opt::algorithm = ECA_OVERLAP;
+		else if(algo_str == "fmextend")
+            opt::algorithm = ECA_FMEXTEND;
 		else
         {
             std::cerr << SUBPROGRAM << ": unrecognized -a,--algorithm parameter: " << algo_str << "\n";
