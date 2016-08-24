@@ -13,6 +13,8 @@ OutputName.fa : the file of corrected read.
 
 -a : the corretion algorithm.
 
+-p : the Name of your Inputfile.
+
 -k : the kmer size for checking kmer solid or not.
 
 -K : the kmer size when align in extend step.
