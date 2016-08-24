@@ -5,7 +5,7 @@ StriDe: https://github.com/ythuang0522/StriDe
 
 Command: 
 
-stride correct -a fmextend -t 30 -k 31 -K 15 InputName.fa -o OutputName.fa
+stride correct -a fmextend -p InputName -t 30 -k 31 -K 15 InputName.fa -o OutputName.fa
 
 InputName.fa : Input file(fasta)
 
