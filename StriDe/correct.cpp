@@ -111,7 +111,7 @@ namespace opt
     static ErrorCorrectAlgorithm algorithm = ECA_OVERLAP;
 }
 
-static const char* shortopts = "p:m:d:e:t:l:s:o:r:b:a:c:K:k:x:i:v";
+static const char* shortopts = "p:m:d:e:t:l:s:o:r:b:a:c:k:K:x:i:v";
 
 enum { OPT_HELP = 1, OPT_VERSION, OPT_METRICS, OPT_DISCARD, OPT_LEARN, OPT_DIPLOID };
 
@@ -129,8 +129,8 @@ static const struct option longopts[] = {
     { "sample-rate",   required_argument, NULL, 'd' },
     { "conflict",      required_argument, NULL, 'c' },
     { "branch-cutoff", required_argument, NULL, 'b' },
-    { "kmer-size",     required_argument, NULL, 'K' },
-	{ "check-kmer-size",     required_argument, NULL, 'k' },
+    { "kmer-size",     required_argument, NULL, 'k' },
+	{ "check-kmer-size",     required_argument, NULL, 'K' },
     { "kmer-threshold",required_argument, NULL, 'x' },
     { "kmer-rounds",   required_argument, NULL, 'i' },
     { "learn",         no_argument,       NULL, OPT_LEARN },
@@ -178,6 +178,25 @@ int correctMain(int argc, char** argv)
         if(threshold != -1)
             CorrectionThresholds::Instance().setBaseMinSupport(threshold);
     }
+	
+	size_t n_samples = 10000;
+	KmerDistribution kmerDistribution;
+    int k = opt::kmerLength;
+    for(size_t i = 0; i < n_samples; ++i)
+    {
+        std::string s = BWTAlgorithms::sampleRandomString(pBWT);
+        int n = s.size();
+        int nk = n - k + 1;
+        for(int j = 0; j < nk; ++j)
+        {
+            std::string kmer = s.substr(j, k);
+            int count = BWTAlgorithms::countSequenceOccurrences(kmer, pBWT);
+            kmerDistribution.add(count);
+        }
+    }
+	kmerDistribution.computeKDAttributes();
+	//printf("The kmer median = %d\n",(int)kmerDistribution.getMedian());
+	ecParams.solid_threshold=(int)kmerDistribution.getMedian();
 
     // Open outfiles and start a timer
     std::ostream* pWriter = createWriter(opt::outFile);

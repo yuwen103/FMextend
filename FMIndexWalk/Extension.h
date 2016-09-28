@@ -28,7 +28,7 @@ namespace Extension
 	void addStrInKsub2(std::vector<OutInfo>& Out_Info,int kmer_size,std::vector<Out_test>& out_vct,std::string Query);
 	void addStrInKsub3(std::vector<OutInfo>& Out_Info,int kmer_size,std::vector<Ksub_vct>& correct_ksub,std::string Query);
 	
-	Solid_error getSolidRegion(std::string Query,int kmer_size,const BWT* pBWT);
+	Solid_error getSolidRegion(std::string Query,int kmer_size,int thrshold,const BWT* pBWT);
 	Solid_error highError_getSolidRegion(std::string Query,int kmer_size,const BWT* pBWT);
 	std::string getSolidRegion_v2(std::string Query,int Seed_size,const BWT* pBWT);
 	

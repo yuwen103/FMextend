@@ -63,7 +63,7 @@ struct ErrorCorrectParameters
     int kmerLength;
 	
 	int check_kmerLength;
-	
+	int solid_threshold;
     // output options
     bool printOverlaps;
 

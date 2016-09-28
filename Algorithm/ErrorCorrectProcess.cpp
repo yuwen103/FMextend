@@ -98,6 +98,8 @@ ErrorCorrectResult ErrorCorrectProcess::FMextendCorrection(const SequenceWorkIte
 	
 	//check high correctness region kmer size
 	int SolidKmer_size=m_params.kmerLength;
+	
+	//Extension::printfKFQ(Query,SolidKmer_size,m_params.indices.pBWT);
 	//the kmer size of kmer alignment
 	size_t Seed_size2=m_params.check_kmerLength;
 	
@@ -107,8 +109,9 @@ ErrorCorrectResult ErrorCorrectProcess::FMextendCorrection(const SequenceWorkIte
 	std::vector<OutInfo> Out_Info;
 	
 	correct_ksub.clear();
-	
-	solid_info=Extension::getSolidRegion(Query,SolidKmer_size,m_params.indices.pBWT);
+	//printf("The solid threshold=%d\n",m_params.solid_threshold);
+	int solid_kmer_threshold=(int)(m_params.solid_threshold*0.5);
+	solid_info=Extension::getSolidRegion(Query,SolidKmer_size,solid_kmer_threshold,m_params.indices.pBWT);
 
 	std::vector<BWTInterval> L_TerminatedIntervals,R_TerminatedIntervals; 
 	L_TerminatedIntervals.clear();
@@ -153,7 +156,7 @@ ErrorCorrectResult ErrorCorrectProcess::FMextendCorrection(const SequenceWorkIte
 			Seed_size2=7;
 			k_diff=temp_solid_size-(int)Seed_size2;
 			
-			solid_info=Extension::getSolidRegion(Query,temp_solid_size,m_params.indices.pBWT);
+			solid_info=Extension::getSolidRegion(Query,temp_solid_size,solid_kmer_threshold,m_params.indices.pBWT);
 			
 			if(solid_info.solid_left_idx>=0)
 			{

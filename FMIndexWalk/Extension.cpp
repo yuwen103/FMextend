@@ -278,7 +278,7 @@ void Extension::addStrInKsub3(std::vector<OutInfo>& Out_Info,int kmer_size,std::
 	
 }
 
-Solid_error Extension::getSolidRegion(std::string Query,int kmer_size,const BWT* pBWT)
+Solid_error Extension::getSolidRegion(std::string Query,int kmer_size,int thrshold,const BWT* pBWT)
 {
 	Solid_error out(-1,-1,"","");
 	
@@ -307,19 +307,21 @@ Solid_error Extension::getSolidRegion(std::string Query,int kmer_size,const BWT*
 			{
 				isLargeThanOne=true;
 			}
-			
-			if(!isSolid && bip1.isValid() && bip1_revc.isValid() &&( (int)bip1.size()>6 ||(int)bip1_revc.size()>6 ) )
+			//if(!isSolid && bip1.isValid() && bip1_revc.isValid() &&( (int)bip1.size()>6 ||(int)bip1_revc.size()>6 ) )
+			if(!isSolid && bip1.isValid() && bip1_revc.isValid() &&( (int)bip1.size()>thrshold ||(int)bip1_revc.size()>thrshold ) )
 			{
 				isSolid=true;
 				start_idx=i;
 				end_idx=i;
 			}
-			else if( isSolid && bip1.isValid() && bip1_revc.isValid() &&( (int)bip1.size()>6 ||(int)bip1_revc.size()>6 ) )
+			//else if( isSolid && bip1.isValid() && bip1_revc.isValid() &&( (int)bip1.size()>6 ||(int)bip1_revc.size()>6 ) )
+			else if( isSolid && bip1.isValid() && bip1_revc.isValid() &&( (int)bip1.size()>thrshold ||(int)bip1_revc.size()>thrshold ) )
 			{
 				end_idx=i;
 			}
 			//else if( isSolid && (!bip1.isValid() || !bip1_revc.isValid()))
-			else if( isSolid && (!bip1.isValid() || !bip1_revc.isValid()||( (int)bip1.size()<=6 &&(int)bip1_revc.size()<=6 ) ))
+			//else if( isSolid && (!bip1.isValid() || !bip1_revc.isValid()||( (int)bip1.size()<=6 &&(int)bip1_revc.size()<=6 ) ))
+			else if( isSolid && (!bip1.isValid() || !bip1_revc.isValid()||( (int)bip1.size()<=thrshold &&(int)bip1_revc.size()<=thrshold ) ))
 			{
 				s_e_vct.push_back(std::make_pair(start_idx,end_idx));
 				isSolid=false;
